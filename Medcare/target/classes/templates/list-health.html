@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<button onclick="history.back()"
+        class="btn btn-secondary mb-3">
+    ← Quay lại
+</button>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Danh sách</title>
+</head>
+<body>
+
+<h2>Lịch sử sức khỏe</h2>
+
+<table border="1">
+    <tr>
+        <th>Ngày</th>
+        <th>Cân nặng</th>
+        <th>Chiều cao</th>
+        <th>BMI</th>
+        <th>Huyết áp</th>
+        <th>Nhịp tim</th>
+    </tr>
+
+    <tr th:each="r : ${records}">
+        <td th:text="${r.date}"></td>
+        <td th:text="${r.weight}"></td>
+        <td th:text="${r.height}"></td>
+        <td th:text="${r.bmi}"></td>
+        <td th:text="${r.bloodPressure}"></td>
+        <td th:text="${r.heartRate}"></td>
+    </tr>
+</table>
+
+</body>
+</html>

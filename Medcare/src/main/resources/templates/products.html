@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thực phẩm chức năng – MedCare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary:#0077b6; --accent:#06d6a0; --dark:#03045e; }
+        body { font-family:'Be Vietnam Pro',sans-serif; background:#f0f9ff; color:#23272f; }
+
+        /* NAV */
+        .navbar-custom { background:rgba(3,4,94,0.95); backdrop-filter:blur(12px); padding:14px 0; position:sticky; top:0; z-index:1000; box-shadow:0 2px 20px rgba(0,0,0,0.25); }
+        .navbar-brand-custom { font-size:1.6rem; font-weight:800; color:#fff!important; text-decoration:none; display:flex; align-items:center; gap:8px; }
+        .navbar-brand-custom span { color:#00b4d8; }
+        .nav-link-custom { color:rgba(255,255,255,0.85)!important; font-weight:500; padding:8px 14px; border-radius:8px; transition:all 0.2s; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+        .nav-link-custom:hover { background:rgba(255,255,255,0.12); color:#fff!important; }
+        .btn-nav-primary { background:#00b4d8; color:#fff!important; border-radius:10px; padding:8px 18px; font-weight:600; border:none; text-decoration:none; transition:all 0.2s; }
+        .btn-nav-primary:hover { background:#0077b6; transform:translateY(-1px); }
+        .cart-badge { background:#ef4444; color:#fff; border-radius:50%; font-size:0.7rem; padding:2px 6px; margin-left:4px; }
+
+        /* PAGE HEADER */
+        .page-header { background:linear-gradient(135deg,var(--dark),#0077b6); color:#fff; padding:48px 0 40px; }
+        .page-header h1 { font-size:2rem; font-weight:800; }
+        .page-header p { opacity:0.8; margin-top:8px; }
+
+        /* SEARCH BAR */
+        .search-bar { background:#fff; border-radius:16px; padding:24px 28px; box-shadow:0 4px 20px rgba(0,119,182,0.1); margin-top:-28px; position:relative; z-index:10; }
+        .search-input { border:1.5px solid #e2e8f0; border-radius:12px; padding:12px 16px; font-size:0.95rem; width:100%; }
+        .search-input:focus { border-color:#00b4d8; box-shadow:0 0 0 3px rgba(0,180,216,0.15); outline:none; }
+        .btn-search { background:linear-gradient(135deg,#0077b6,#00b4d8); color:#fff; border:none; border-radius:12px; padding:12px 24px; font-weight:600; transition:all 0.2s; cursor:pointer; }
+        .btn-search:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,119,182,0.3); }
+        .btn-add { background:linear-gradient(135deg,#059669,#06d6a0); color:#fff; border:none; border-radius:12px; padding:12px 20px; font-weight:600; transition:all 0.2s; text-decoration:none; white-space:nowrap; }
+        .btn-add:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(6,214,160,0.3); color:#fff; }
+
+        /* PRODUCT CARD */
+        .product-card { background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 4px 24px rgba(0,119,182,0.07); transition:all 0.25s; border:1px solid #e8f4fd; height:100%; display:flex; flex-direction:column; }
+        .product-card:hover { transform:translateY(-6px); box-shadow:0 14px 40px rgba(0,119,182,0.15); }
+        .img-wrap { overflow:hidden; height:220px; }
+        .product-img { height:220px; object-fit:cover; width:100%; transition:transform 0.3s; }
+        .product-card:hover .product-img { transform:scale(1.04); }
+        .product-body { padding:20px; display:flex; flex-direction:column; flex:1; }
+        .product-name { font-size:1.05rem; font-weight:700; color:var(--dark); margin-bottom:6px; }
+        .product-desc { color:#6c757d; font-size:0.88rem; line-height:1.6; flex:1; }
+        .product-price { font-size:1.25rem; font-weight:800; color:#e53e3e; margin:12px 0 6px; }
+        .stock-badge { background:#e0f7fa; color:#0077b6; border-radius:100px; padding:3px 12px; font-size:0.8rem; font-weight:600; display:inline-block; }
+        .btn-add-cart { background:linear-gradient(135deg,#0077b6,#00b4d8); color:#fff; border:none; border-radius:12px; padding:11px; font-weight:600; width:100%; transition:all 0.2s; margin-top:14px; cursor:pointer; }
+        .btn-add-cart:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,119,182,0.3); }
+        .admin-actions { display:flex; gap:8px; margin-top:8px; }
+        .btn-edit { background:#fef3c7; color:#d97706; border:none; border-radius:10px; padding:8px; font-size:0.85rem; flex:1; font-weight:600; transition:all 0.2s; text-decoration:none; text-align:center; }
+        .btn-edit:hover { background:#f59e0b; color:#fff; }
+        .btn-delete { background:#fef2f2; color:#ef4444; border:none; border-radius:10px; padding:8px; font-size:0.85rem; flex:1; font-weight:600; transition:all 0.2s; text-decoration:none; text-align:center; }
+        .btn-delete:hover { background:#ef4444; color:#fff; }
+
+        /* FOOTER */
+        .footer { background:var(--dark); color:rgba(255,255,255,0.7); padding:30px 0; margin-top:60px; text-align:center; }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar-custom">
+    <div class="container d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <a class="navbar-brand-custom" th:href="@{/}"><i class="fa-solid fa-heart-pulse"></i> Med<span>Care</span></a>
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <a th:href="@{/}" class="nav-link-custom"><i class="fa-solid fa-house"></i> Trang chủ</a>
+            <a th:href="@{/dashboard}" class="nav-link-custom"><i class="fa-solid fa-chart-line"></i> Sức khoẻ</a>
+            <div sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/admin/dashboard}" class="nav-link-custom" style="color:#f87171!important"><i class="fa-solid fa-gauge-high"></i> Admin</a>
+            </div>
+            <a th:href="@{/cart}" class="nav-link-custom">
+                <i class="fa-solid fa-cart-shopping"></i><span class="cart-badge" th:text="${cartCount ?: 0}">0</span>
+            </a>
+            <div th:if="${#authorization.expression('isAnonymous()')}">
+                <a th:href="@{/login}" class="btn-nav-primary"><i class="fa-solid fa-right-to-bracket"></i> Đăng nhập</a>
+            </div>
+            <div th:if="${#authorization.expression('isAuthenticated()')}" class="d-flex align-items-center gap-2">
+                <span class="nav-link-custom"><i class="fa-solid fa-user-circle"></i> <span th:text="${#authentication.name}"></span></span>
+                <a th:href="@{/my-orders}" class="nav-link-custom"><i class="fa-solid fa-box"></i></a>
+                <form th:action="@{/logout}" method="post" style="margin:0">
+                    <button class="nav-link-custom" style="background:none;border:none;color:#f87171!important;cursor:pointer"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fa-solid fa-capsules"></i> Thực phẩm chức năng</h1>
+        <p>Sản phẩm hỗ trợ sức khoẻ chất lượng cao, được kiểm định rõ ràng</p>
+    </div>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="container">
+    <div class="search-bar">
+        <div class="d-flex gap-3 align-items-center flex-wrap">
+            <input type="text" class="search-input flex-grow-1" placeholder="🔍 Tìm kiếm sản phẩm...">
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/products/create}" class="btn-add">
+                <i class="fa-solid fa-plus"></i> Thêm sản phẩm
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- PRODUCT GRID -->
+<div class="container py-5">
+    <div th:if="${#lists.isEmpty(products)}" class="text-center py-5">
+        <i class="fa-solid fa-box-open" style="font-size:3rem;color:#cbd5e0"></i>
+        <p class="mt-3 text-muted">Không tìm thấy sản phẩm nào.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-sm-6 col-lg-4" th:each="p : ${products}">
+            <div class="product-card">
+                <div class="img-wrap">
+                    <img th:src="@{${p.imageUrl}}" class="product-img" alt="Ảnh sản phẩm"
+                         onerror="this.onerror=null;this.src='https://placehold.co/400x400/e2e8f0/64748b?text=Product';">
+                </div>
+                <div class="product-body">
+                    <h5 class="product-name" th:text="${p.name}">Tên sản phẩm</h5>
+                    <p class="product-desc" th:text="${p.description}">Mô tả sản phẩm</p>
+                    <div class="product-price" th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')} + ' VNĐ'"></div>
+                    <div><span class="stock-badge"><i class="fa-solid fa-box"></i> Còn lại: <span th:text="${p.stock}"></span></span></div>
+                    <form th:action="@{/cart/add/{id}(id=${p.id})}" method="post">
+                        <button type="submit" class="btn-add-cart"><i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ hàng</button>
+                    </form>
+                    <div sec:authorize="hasRole('ADMIN')" class="admin-actions">
+                        <a th:href="@{'/admin/products/edit/' + ${p.id}}" class="btn-edit"><i class="fa-solid fa-pen"></i> Sửa</a>
+                        <a th:href="@{'/admin/products/delete/' + ${p.id}}" class="btn-delete" onclick="return confirm('Xóa sản phẩm này?')"><i class="fa-solid fa-trash"></i> Xóa</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <p>© 2026 <strong style="color:#00b4d8">MedCare</strong> – Chăm sóc sức khoẻ toàn diện</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

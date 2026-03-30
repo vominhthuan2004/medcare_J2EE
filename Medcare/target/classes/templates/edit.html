@@ -1,0 +1,25 @@
+<button onclick="history.back()"
+        class="btn btn-secondary mb-3">
+    ← Quay lại
+</button>
+<body style="background: linear-gradient(135deg,#1cc88a,#4e73df); min-height:100vh;">
+
+<div class="container mt-5">
+    <div class="card p-4">
+        <h4>Sửa chỉ số</h4>
+
+        <form th:action="@{/update}" method="post">
+
+            <input type="hidden" th:field="${record.id}" />
+
+            <input type="number" class="form-control mb-3"
+                   th:field="${record.height}" placeholder="Chiều cao">
+
+            <input type="number" class="form-control mb-3"
+                   th:field="${record.weight}" placeholder="Cân nặng">
+            <input type="number" name="heartRate" th:value="${record.heartRate}" required>
+
+            <button class="btn btn-success w-100">Cập nhật</button>
+        </form>
+    </div>
+</div>

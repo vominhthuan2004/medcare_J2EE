@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý sản phẩm – MedCare Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { box-sizing:border-box; }
+        /* LIGHT OCEAN BLUE / TEAL THEME */
+        :root {
+            --bg-deep: #F4F7FE;
+            --bg-card: #FFFFFF;
+            --primary: #00B4D8;
+            --primary-dark: #0077B6;
+            --primary-glow: rgba(0, 180, 216, 0.25);
+            --text-main: #1E293B;
+            --text-sub: #64748B;
+            --border-color: #E2E8F0;
+        }
+
+        body { font-family:'Be Vietnam Pro',sans-serif; background:var(--bg-deep); color:var(--text-main); min-height:100vh; overflow-x:hidden; }
+
+        /* ═══ ANIMATED BG ═══ */
+        body::before { content:''; position:fixed; top:-50%; left:-50%; width:200%; height:200%;
+            background:radial-gradient(circle at 20% 50%, rgba(0,180,216,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(0,119,182,0.06) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 80%, rgba(6,214,160,0.06) 0%, transparent 50%);
+            animation:bgShift 20s ease-in-out infinite; z-index:0; pointer-events:none; }
+        @keyframes bgShift { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-3%,2%)} }
+
+        /* ═══ SIDEBAR ═══ */
+        .sidebar { width:260px; background:#FFFFFF; position:fixed; top:0; left:0; bottom:0; z-index:100; display:flex; flex-direction:column; border-right:1px solid var(--border-color); box-shadow: 4px 0 24px rgba(0,0,0,0.04); }
+        .sidebar-brand { padding:28px 24px; border-bottom:1px solid var(--border-color); }
+        .sidebar-brand a { font-size:1.5rem; font-weight:900; color:#1E293B; text-decoration:none; display:flex; align-items:center; gap:12px; }
+        .sidebar-brand .logo-icon { width:42px; height:42px; background:linear-gradient(135deg, var(--primary-dark), var(--primary)); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; box-shadow:0 4px 15px var(--primary-glow); color:#fff; }
+        .sidebar-brand a span { background:linear-gradient(135deg, var(--primary-dark), var(--primary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .sidebar-nav { padding:20px 14px; flex:1; }
+        .sidebar-label { font-size:0.68rem; font-weight:700; color:#94A3B8; letter-spacing:2px; text-transform:uppercase; padding:12px 12px 6px; }
+        .nav-item-custom { display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:12px; color:var(--text-sub); text-decoration:none; font-size:0.9rem; font-weight:600; transition:all 0.25s; margin-bottom:3px; position:relative; overflow:hidden; }
+        .nav-item-custom:hover { background:rgba(0,180,216,0.05); color:var(--primary-dark); transform:translateX(4px); }
+        .nav-item-custom.active { background:linear-gradient(135deg, rgba(0,119,182,0.08), rgba(0,180,216,0.08)); color:var(--primary-dark); border:1px solid rgba(0,180,216,0.15); }
+        .nav-item-custom.active::before { content:''; position:absolute; left:0; top:20%; bottom:20%; width:3px; background:linear-gradient(180deg, var(--primary-dark), var(--primary)); border-radius:0 4px 4px 0; }
+        .nav-item-custom i { width:20px; text-align:center; font-size:0.95rem; }
+        .sidebar-footer { padding:18px 22px; border-top:1px solid var(--border-color); }
+        .sidebar-footer button { background:none; border:none; padding:10px 14px; width:100%; cursor:pointer; display:flex; align-items:center; gap:10px; color:var(--text-sub); font-size:0.88rem; font-weight:600; font-family:inherit; transition:all 0.2s; border-radius:10px; }
+        .sidebar-footer button:hover { background:rgba(239,68,68,0.1); color:#ef4444; }
+
+        /* ═══ MAIN ═══ */
+        .main-content { margin-left:260px; padding:32px; min-height:100vh; position:relative; z-index:1; }
+
+        /* TOP BAR */
+        .top-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; flex-wrap:wrap; gap:16px; }
+        .top-bar h1 { font-size:1.8rem; font-weight:900; color:var(--text-main); margin:0; display:flex; align-items:center; gap:12px; }
+        .top-bar h1 i { background:linear-gradient(135deg, var(--primary-dark), var(--primary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        
+        /* ADD PRODUCT BTN */
+        .btn-add-product { background:linear-gradient(135deg, var(--primary-dark), var(--primary)); color:#fff; border:none; border-radius:12px; padding:12px 24px; font-weight:700; font-size:0.95rem; text-decoration:none; display:flex; align-items:center; gap:8px; transition:all 0.25s; box-shadow:0 6px 20px var(--primary-glow); }
+        .btn-add-product:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(0,180,216,0.35); color:#fff; }
+
+        /* PRODUCT TABLE */
+        .products-card { background:#FFFFFF; border-radius:20px; border:1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.03); overflow:hidden; position:relative; z-index:2; }
+        .products-table { --bs-table-bg:transparent; --bs-table-striped-bg:transparent; --bs-table-hover-bg:#F8FAFC; --bs-table-color:var(--text-main); --bs-table-border-color:var(--border-color); }
+        .products-table thead th { background:#F8FAFC; color:var(--text-sub); font-weight:700; font-size:0.82rem; padding:16px 20px; border:none; border-bottom:1px solid var(--border-color); text-transform:uppercase; letter-spacing:0.5px; }
+        .products-table tbody tr { background:transparent; transition:all 0.2s; }
+        .products-table tbody tr:nth-child(even) { background:#F8FAFC; }
+        .products-table tbody td { padding:14px 20px; border-color:var(--border-color); color:var(--text-main); font-size:0.95rem; vertical-align:middle; background:transparent; }
+        .products-table tbody tr:hover { background:rgba(0,180,216,0.04); }
+        
+        .product-img-sm { width:56px; height:56px; object-fit:cover; border-radius:12px; border:1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .product-name-cell { font-weight:700; color:var(--text-main); }
+        .price-cell { color:#D97706; font-weight:800; }
+        
+        .stock-pill { background:rgba(0,180,216,0.1); color:var(--primary-dark); border-radius:100px; padding:4px 14px; font-size:0.85rem; font-weight:700; border:1px solid rgba(0,180,216,0.2); }
+        .stock-low { background:rgba(239, 68, 68, 0.1); color:#EF4444; border:1px solid rgba(239, 68, 68, 0.2); }
+        
+        .btn-edit { background:rgba(245, 158, 11, 0.1); color:#D97706; border:1px solid rgba(245, 158, 11, 0.2); border-radius:10px; padding:6px 14px; font-size:0.85rem; font-weight:700; text-decoration:none; transition:all 0.25s; white-space:nowrap; }
+        .btn-edit:hover { background:#F59E0B; color:#fff; border-color:#F59E0B; transform:translateY(-1px); box-shadow:0 4px 10px rgba(245, 158, 11, 0.2); }
+        
+        .btn-del { background:rgba(239, 68, 68, 0.1); color:#EF4444; border:1px solid rgba(239, 68, 68, 0.2); border-radius:10px; padding:6px 14px; font-size:0.85rem; font-weight:700; text-decoration:none; transition:all 0.25s; white-space:nowrap; }
+        .btn-del:hover { background:#EF4444; color:#fff; border-color:#EF4444; transform:translateY(-1px); box-shadow:0 4px 10px rgba(239, 68, 68, 0.2); }
+        
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .products-card { animation:fadeInUp 0.5s ease-out backwards; }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="sidebar-brand">
+        <a th:href="@{/}">
+            <div class="logo-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+            Med<span>Care</span>
+        </a>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="sidebar-label">Quản lý</div>
+        <a th:href="@{/admin/dashboard}" class="nav-item-custom"><i class="fa-solid fa-gauge-high"></i> Dashboard</a>
+        <a th:href="@{/admin/products}" class="nav-item-custom active"><i class="fa-solid fa-cubes-stacked"></i> Sản phẩm</a>
+        <a th:href="@{/admin/users}" class="nav-item-custom"><i class="fa-solid fa-id-card-clip"></i> Người dùng</a>
+        <div class="sidebar-label mt-3">Hệ thống</div>
+        <a th:href="@{/}" class="nav-item-custom"><i class="fa-solid fa-house"></i> Trang chủ</a>
+        <a th:href="@{/products}" class="nav-item-custom"><i class="fa-solid fa-store"></i> Cửa hàng</a>
+    </nav>
+    <div class="sidebar-footer">
+        <form th:action="@{/logout}" method="post" style="margin:0">
+            <button type="submit">
+                <i class="fa-solid fa-right-from-bracket" style="color:#EF4444"></i> Đăng xuất
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+    <div class="top-bar">
+        <h1><i class="fa-solid fa-cubes-stacked"></i> Quản lý sản phẩm</h1>
+        <a th:href="@{/admin/products/create}" class="btn-add-product">
+            <i class="fa-solid fa-plus"></i> Thêm sản phẩm
+        </a>
+    </div>
+
+    <div class="products-card">
+        <div class="table-responsive">
+            <table class="table products-table mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Giá</th>
+                        <th>Tồn kho</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${products}">
+                        <td style="color:var(--text-sub);font-weight:700">#<span th:text="${p.id}"></span></td>
+                        <td><img th:src="@{${p.imageUrl}}" class="product-img-sm" alt="img" onerror="this.onerror=null;this.src='https://placehold.co/400x400/e2e8f0/64748b?text=Product';"></td>
+                        <td class="product-name-cell" th:text="${p.name}"></td>
+                        <td class="price-cell" th:text="${#numbers.formatDecimal(p.price,0,'COMMA',0,'POINT')} + ' đ'"></td>
+                        <td>
+                            <span th:classappend="${p.stock < 5} ? 'stock-low'" class="stock-pill" th:text="${p.stock} + ' cái'"></span>
+                        </td>
+                        <td>
+                            <div style="display:flex;gap:8px">
+                                <a th:href="@{'/admin/products/edit/' + ${p.id}}" class="btn-edit"><i class="fa-solid fa-pen"></i> Sửa</a>
+                                <a th:href="@{'/admin/products/delete/' + ${p.id}}" class="btn-del" onclick="return confirm('Xóa sản phẩm này?')"><i class="fa-solid fa-trash-can"></i> Xóa</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${products == null or #lists.isEmpty(products)}">
+                        <td colspan="6" class="text-center" style="color:var(--text-sub);padding:60px;font-weight:500;font-size:1.1rem">
+                            <i class="fa-solid fa-box-open" style="font-size:3rem;display:block;margin-bottom:16px;opacity:0.3"></i>
+                            Chưa có sản phẩm nào
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sức Khoẻ Của Bạn – MedCare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --primary:#0077b6; --accent:#06d6a0; --dark:#03045e; }
+        body { font-family:'Be Vietnam Pro',sans-serif; background:#f0f9ff; color:#23272f; min-height:100vh; }
+
+        /* NAV */
+        .navbar-custom { background:rgba(3,4,94,0.95); backdrop-filter:blur(12px); padding:14px 0; position:sticky; top:0; z-index:1000; box-shadow:0 2px 20px rgba(0,0,0,0.25); }
+        .navbar-brand-custom { font-size:1.6rem; font-weight:800; color:#fff!important; text-decoration:none; display:flex; align-items:center; gap:8px; }
+        .navbar-brand-custom span { color:#00b4d8; }
+        .nav-link-custom { color:rgba(255,255,255,0.85)!important; font-weight:500; padding:8px 14px; border-radius:8px; transition:all 0.2s; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+        .nav-link-custom:hover { background:rgba(255,255,255,0.12); color:#fff!important; }
+        .nav-item-active { background:linear-gradient(135deg,#0077b6,#00b4d8); color:#fff!important; }
+        .cart-badge { background:#ef4444; color:#fff; border-radius:50%; font-size:0.7rem; padding:2px 6px; margin-left:4px; }
+
+        /* HEADER */
+        .page-header { background:linear-gradient(135deg,var(--dark),#0077b6); color:#fff; padding:40px 0 32px; }
+        .page-header h1 { font-size:1.8rem; font-weight:800; }
+
+        /* STAT CARDS */
+        .stat-card { background:#fff; border-radius:20px; padding:24px; box-shadow:0 4px 24px rgba(0,119,182,0.06); border:1px solid #e8f4fd; height:100%; transition:all 0.25s; }
+        .stat-card:hover { transform:translateY(-4px); box-shadow:0 12px 30px rgba(0,119,182,0.12); }
+        .stat-icon { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; margin-bottom:16px; }
+        .stat-value { font-size:1.8rem; font-weight:800; color:var(--dark); line-height:1; }
+        .stat-label { font-size:0.85rem; color:#6c757d; margin-top:6px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; }
+
+        /* AI ADVICE */
+        .ai-card { background:linear-gradient(135deg,#1e1b4b,#312e81); border-radius:20px; padding:28px; color:#fff; box-shadow:0 8px 30px rgba(49,46,129,0.3); border:1px solid rgba(255,255,255,0.1); position:relative; overflow:hidden; }
+        .ai-card::after { content:'\f544'; font-family:'Font Awesome 6 Free'; font-weight:900; position:absolute; right:-20px; top:-20px; font-size:12rem; color:rgba(255,255,255,0.03); transform:rotate(-15deg); }
+        .ai-title { font-size:1.2rem; font-weight:800; margin-bottom:16px; display:flex; align-items:center; gap:10px; color:#818cf8; }
+        .ai-text { font-size:1.05rem; line-height:1.6; opacity:0.9; position:relative; z-index:10; }
+        .diet-card { background:#fff; border-radius:20px; padding:28px; box-shadow:0 4px 24px rgba(0,119,182,0.06); border:1px solid #e8f4fd; border-left:4px solid #10b981; }
+        .diet-title { font-size:1.1rem; font-weight:800; color:#064e3b; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+        .diet-text { font-size:0.95rem; color:#4b5563; white-space:pre-wrap; line-height:1.6; font-family:inherit; margin:0; }
+
+        /* FORM */
+        .form-card { background:#fff; border-radius:20px; padding:28px; box-shadow:0 4px 24px rgba(0,119,182,0.06); border:1px solid #e8f4fd; }
+        .form-control { border-radius:12px; border:1.5px solid #e2e8f0; padding:12px 16px; font-size:0.95rem; transition:all 0.2s; }
+        .form-control:focus { border-color:#00b4d8; box-shadow:0 0 0 3px rgba(0,180,216,0.15); outline:none; }
+        .form-label { font-weight:600; color:#374151; font-size:0.85rem; margin-bottom:6px; }
+        .btn-submit { background:linear-gradient(135deg,#0077b6,#00b4d8); color:#fff; border:none; border-radius:12px; padding:12px; font-weight:700; width:100%; transition:all 0.2s; box-shadow:0 6px 20px rgba(0,119,182,0.3); margin-top:24px; }
+        .btn-submit:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(0,119,182,0.4); }
+
+        /* TABLE */
+        .table-card { background:#fff; border-radius:20px; padding:28px; box-shadow:0 4px 24px rgba(0,119,182,0.06); border:1px solid #e8f4fd; overflow:hidden; }
+        .health-table thead { background:linear-gradient(135deg,#03045e,#0077b6); color:#fff; }
+        .health-table th { font-weight:600; padding:14px 16px; border:none; font-size:0.9rem; white-space:nowrap; }
+        .health-table td { padding:14px 16px; vertical-align:middle; border-bottom:1px solid #f1f5f9; color:#4b5563; font-size:0.9rem; }
+        .health-table tr:hover td { background:#f8faff; }
+        
+        .badge-status { padding:5px 12px; border-radius:100px; font-weight:700; font-size:0.8rem; display:inline-flex; align-items:center; gap:6px; }
+        .status-normal { background:#d1fae5; color:#059669; }
+        .status-thin { background:#e0f2fe; color:#0284c7; }
+        .status-fat { background:#fef3c7; color:#d97706; }
+        .status-obese { background:#fee2e2; color:#dc2626; }
+
+        .btn-action { width:32px; height:32px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; color:#fff; transition:all 0.2s; text-decoration:none; margin:0 2px; }
+        .btn-edit { background:#f59e0b; }
+        .btn-edit:hover { background:#d97706; color:#fff; }
+        .btn-del { background:#ef4444; }
+        .btn-del:hover { background:#dc2626; color:#fff; }
+
+        /* CHART */
+        .chart-card { background:#fff; border-radius:20px; padding:24px; box-shadow:0 4px 24px rgba(0,119,182,0.06); border:1px solid #e8f4fd; }
+
+        /* FOOTER */
+        .footer { background:var(--dark); color:rgba(255,255,255,0.7); padding:30px 0; margin-top:60px; text-align:center; }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar-custom">
+    <div class="container d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <a class="navbar-brand-custom" th:href="@{/}"><i class="fa-solid fa-heart-pulse"></i> Med<span>Care</span></a>
+        <div class="d-flex align-items-center flex-wrap gap-2">
+            <a th:href="@{/}" class="nav-link-custom"><i class="fa-solid fa-house"></i> Trang chủ</a>
+            <a th:href="@{/dashboard}" class="nav-link-custom nav-item-active"><i class="fa-solid fa-chart-line"></i> Sức khoẻ</a>
+            <a th:href="@{/products}" class="nav-link-custom"><i class="fa-solid fa-capsules"></i> Thực phẩm</a>
+            <div sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/admin/dashboard}" class="nav-link-custom" style="color:#f87171!important"><i class="fa-solid fa-gauge-high"></i> Admin</a>
+            </div>
+            <a th:href="@{/cart}" class="nav-link-custom">
+                <i class="fa-solid fa-cart-shopping"></i><span class="cart-badge" th:text="${cartCount ?: 0}">0</span>
+            </a>
+            <div th:if="${#authorization.expression('isAuthenticated()')}" class="d-flex align-items-center gap-2">
+                <span class="nav-link-custom"><i class="fa-solid fa-user-circle"></i> <span th:text="${#authentication.name}"></span></span>
+                <a th:href="@{/my-orders}" class="nav-link-custom"><i class="fa-solid fa-box"></i></a>
+                <form th:action="@{/logout}" method="post" style="margin:0">
+                    <button class="nav-link-custom" style="background:none;border:none;color:#f87171!important;cursor:pointer"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+    <div class="container d-flex align-items-center justify-content-between">
+        <h1><i class="fa-solid fa-chart-pie"></i> Bảng theo dõi sức khoẻ</h1>
+    </div>
+</div>
+
+<div class="container py-5">
+
+    <!-- STATS -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#e0f2fe;color:#0284c7"><i class="fa-solid fa-clipboard-list"></i></div>
+                <div class="stat-value" th:text="${totalRecords != null ? totalRecords : 0}">0</div>
+                <div class="stat-label">Lần đo</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#d1fae5;color:#059669"><i class="fa-solid fa-weight-scale"></i></div>
+                <div class="stat-value"><span class="animate-bmi" th:text="${latestBMI != null ? #numbers.formatDecimal(latestBMI,1,2) : '0'}">0</span></div>
+                <div class="stat-label">Cân nặng BMI</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#fef3c7;color:#d97706"><i class="fa-solid fa-child-reaching"></i></div>
+                <div class="stat-value"><span th:text="${latestWeight != null ? latestWeight : '0'}">0</span> <span style="font-size:1rem;color:#6c757d">kg</span></div>
+                <div class="stat-label">Cân nặng hiện tại</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background:#fee2e2;color:#dc2626"><i class="fa-solid fa-heart-pulse"></i></div>
+                <div class="stat-value" th:text="${latestStatus != null ? latestStatus : '--'}" style="font-size:1.3rem">--</div>
+                <div class="stat-label">Trạng thái</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI & DIET ADVICE -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="ai-card h-100">
+                <div class="ai-title"><i class="fa-solid fa-robot"></i> AI Phân tích chuyên sâu</div>
+                <p class="ai-text" th:text="${aiAdvice ?: 'Chưa có đủ dữ liệu để phân tích.'}">Đang phân tích...</p>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="diet-card h-100">
+                <div class="diet-title"><i class="fa-solid fa-leaf"></i> Gợi ý chế độ ăn uống & sinh hoạt</div>
+                <pre class="diet-text" th:text="${dietAdvice ?: 'Hãy nhập số đo để nhận gợi ý từ chuyên gia.'}"></pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- FORM -->
+        <div class="col-lg-4">
+            <div class="form-card sticky-top" style="top:100px;z-index:10">
+                <h5 style="font-weight:800;color:#03045e;margin-bottom:20px"><i class="fa-solid fa-plus-circle"></i> Nhập số đo mới</h5>
+                <form th:action="@{/save}" method="post">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fa-solid fa-ruler-vertical"></i> Chiều cao (cm)</label>
+                        <input type="number" step="0.1" class="form-control" name="height" placeholder="VD: 170" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fa-solid fa-weight-scale"></i> Cân nặng (kg)</label>
+                        <input type="number" step="0.1" class="form-control" name="weight" placeholder="VD: 65.5" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fa-solid fa-heart-pulse"></i> Nhịp tim (bpm)</label>
+                        <input type="number" step="1" class="form-control" name="heartRate" placeholder="VD: 75" required>
+                    </div>
+                    <button type="submit" class="btn-submit">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Lưu kết quả & Phân tích
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- CHARTS & TABLE -->
+        <div class="col-lg-8">
+            <!-- CHARTS -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="chart-card">
+                        <h6 style="font-weight:700;color:#03045e;margin-bottom:16px"><i class="fa-solid fa-chart-area"></i> Biểu đồ BMI</h6>
+                        <canvas id="bmiChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-card">
+                        <h6 style="font-weight:700;color:#03045e;margin-bottom:16px"><i class="fa-solid fa-chart-line"></i> Biểu đồ Cân nặng</h6>
+                        <canvas id="weightChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div class="table-card" style="padding:0">
+                <div style="padding:24px;border-bottom:1px solid #f1f5f9">
+                    <h5 style="font-weight:800;color:#03045e;margin:0"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử đo</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table health-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Ngày đo</th>
+                                <th class="text-center">Chiều cao</th>
+                                <th class="text-center">Cân nặng</th>
+                                <th class="text-center">Nhịp tim</th>
+                                <th class="text-center">BMI</th>
+                                <th>Trạng thái</th>
+                                <th class="text-end">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r : ${records}">
+                                <td style="font-weight:600;color:#1e293b" th:text="${r.date}"></td>
+                                <td class="text-center" th:text="${r.height} + ' cm'"></td>
+                                <td class="text-center" th:text="${r.weight} + ' kg'"></td>
+                                <td class="text-center" th:text="${r.heartRate} + ' bpm'"></td>
+                                <td class="text-center font-monospace fw-bold" th:text="${#numbers.formatDecimal(r.bmi,1,2)}"></td>
+                                <td>
+                                    <!-- Use dynamic class formatting -->
+                                    <span class="badge-status"
+                                          th:classappend="${r.status.contains('Bình') ? 'status-normal' : (r.status.contains('Thừa') ? 'status-fat' : (r.status.contains('Gầy') ? 'status-thin' : (r.status.contains('Béo') ? 'status-obese' : 'bg-secondary')))}">
+                                        <i class="fa-solid" th:classappend="${r.status.contains('Bình') ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                                        <span th:text="${r.status}"></span>
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <a th:href="@{/edit/{id}(id=${r.id})}" class="btn-action btn-edit" title="Sửa"><i class="fa-solid fa-pen fa-sm"></i></a>
+                                    <a th:href="@{/delete/{id}(id=${r.id})}" class="btn-action btn-del" title="Xoá" onclick="return confirm('Xoá bản ghi này?')"><i class="fa-solid fa-trash fa-sm"></i></a>
+                                </td>
+                            </tr>
+                            <tr th:if="${records == null or #lists.isEmpty(records)}">
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-file-waveform" style="font-size:2rem;color:#cbd5e0;margin-bottom:10px;display:block"></i>
+                                    Bạn chưa có dữ liệu đo nào.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <p>© 2026 <strong style="color:#00b4d8">MedCare</strong> – Chăm sóc sức khoẻ toàn diện</p>
+</footer>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    let labels = /*[[${records.![date]}]]*/ [];
+    let bmiData = /*[[${records.![bmi]}]]*/ [];
+    let weightData = /*[[${records.![weight]}]]*/ [];
+
+    // Reverse data if it comes in descending date order so charts flow left->right
+    if (labels && labels.length > 0) {
+        labels = labels.reverse();
+        bmiData = bmiData.reverse();
+        weightData = weightData.reverse();
+    }
+
+    // BMI Chart
+    const ctxBmi = document.getElementById('bmiChart').getContext('2d');
+    const gradBmi = ctxBmi.createLinearGradient(0, 0, 0, 300);
+    gradBmi.addColorStop(0, 'rgba(0,180,216,0.5)');
+    gradBmi.addColorStop(1, 'rgba(0,180,216,0)');
+
+    new Chart(ctxBmi, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'BMI', data: bmiData,
+                borderColor: '#00b4d8', backgroundColor: gradBmi,
+                fill: true, tension: 0.4, borderWidth: 3, pointRadius: 4, pointBackgroundColor: '#03045e'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { display: false }, y: { beginAtZero: false } }
+        }
+    });
+
+    // Weight Chart
+    const ctxWeight = document.getElementById('weightChart').getContext('2d');
+    const gradWeight = ctxWeight.createLinearGradient(0, 0, 0, 300);
+    gradWeight.addColorStop(0, 'rgba(6,214,160,0.5)');
+    gradWeight.addColorStop(1, 'rgba(6,214,160,0)');
+
+    new Chart(ctxWeight, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Cân nặng (kg)', data: weightData,
+                borderColor: '#06d6a0', backgroundColor: gradWeight,
+                fill: true, tension: 0.4, borderWidth: 3, pointRadius: 4, pointBackgroundColor: '#064e3b'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { x: { display: false }, y: { beginAtZero: false } }
+        }
+    });
+    /*]]>*/
+</script>
+
+<script>
+    function animateValue(obj, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            obj.innerHTML = (progress * (end - start) + start).toFixed(1);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const bmiElement = document.querySelector(".animate-bmi");
+        if (bmiElement && !isNaN(bmiElement.innerText)) {
+            animateValue(bmiElement, 0, parseFloat(bmiElement.innerText), 1000);
+        }
+    });
+</script>
+</body>
+</html>

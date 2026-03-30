@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<button onclick="history.back()"
+        class="btn btn-secondary mb-3">
+    ← Quay lại
+</button>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Thêm chỉ số sức khỏe</title>
+</head>
+<body>
+<h2>Nhập thông tin sức khỏe</h2>
+
+<form th:action="@{/health/save}" method="post">
+    Cân nặng (kg): <input type="number" step="0.1" name="weight"/><br/>
+    Chiều cao (m): <input type="number" step="0.01" name="height"/><br/>
+    Huyết áp: <input type="text" name="bloodPressure"/><br/>
+    Nhịp tim: <input type="number" name="heartRate"/><br/>
+    <button type="submit">Lưu</button>
+</form>
+
+</body>
+</html>
